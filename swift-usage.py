@@ -68,7 +68,7 @@ def main():
     for tenant in tenant_lists:
         try:
             email = keystone_cnx.users.list(tenant_id=tenant.id)[0].email
-        except(AttributeError, IndexError):
+        except Exception:
             email = "None"
         try:
             pile.spawn(swstat.retrieve_account_stats, tenant,
