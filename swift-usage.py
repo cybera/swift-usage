@@ -17,13 +17,13 @@ def get_swift_auth(auth_url, tenant, user, password, os_options):
         auth_url,
         '%s:%s' % (tenant, user),
         password,
-        auth_version=2,
+        auth_version=3,
         os_options=os_options).get_auth()
 
 def main():
     endpoint_type='public'
     for line in open("/root/openrc"):
-        if "OS_TENANT_NAME"  in line:
+        if "OS_PROJECT_NAME"  in line:
             line=line.replace('\"','').rstrip()
             line=line.split('=')
             admin_tenant=line[1]
@@ -44,10 +44,10 @@ def main():
             line=line.split('=')
             region_name=line[1]
 
-    keystone_cnx = keystoneclient.v2_0.client.Client(auth_url=auth_url,
+    keystone_cnx = keystoneclient.v3.client.Client(auth_url=auth_url,
                                                      username=admin_user,
                                                      password=password,
-                                                     tenant_name=admin_tenant,
+                                                     project_name=admin_tenant,
                                                      region_name=region_name)
     admin_token = keystone_cnx.auth_token
     os_options = {
@@ -61,7 +61,7 @@ def main():
                                                  os_options)
     bare_storage_url = storage_url[:storage_url.find('AUTH')] + "AUTH_"
 
-    tenant_lists = keystone_cnx.tenants.list()
+    tenant_lists = keystone_cnx.projects.list()
     stats = []
     pile = eventlet.GreenPile(size_or_pool=10)
     U_time = int(time.time())
